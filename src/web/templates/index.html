@@ -1,0 +1,188 @@
+<!-- container -->
+{% extends "base.html" %}
+
+<!-- custom tags -->
+{% load custom_tags %}
+
+<!-- replace the base.html block tags with content -->
+{% block content %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-4">
+  <!-- Form fields -->
+  <h3>Create</h3>
+  <form method="POST" action="." autocomplete="off" onsubmit="showSpinner();"> <!-- make post to current url -->
+    <!-- CSRF token, otherwise will throw 403 forbidden -->
+    <!-- <input type="hidden" name="csrfmiddlewaretoken" value="ku9FEcdo..."> -->
+    {% csrf_token %} 
+    <input type="hidden" name="id" />
+    <div class="input-group mb-1">
+      <div class="input-group-prepend">
+        <span class="input-group-text" style="width: 90px;">Name</span>
+      </div>
+      <input type="text" name="title" class="form-control" placeholder="" />
+    </div>
+    <div class="input-group mb-1">
+      <div class="input-group-prepend">
+        <span class="input-group-text" style="width: 90px;">Address</span>
+      </div>
+      <input type="text" name="address" class="form-control" placeholder="" />
+    </div>
+    <div class="input-group mb-1">
+      <div class="input-group-prepend">
+        <span class="input-group-text" style="width: 90px;">Icon</span>
+      </div>
+      <input type="text" name="icon" class="form-control" placeholder="" />
+    </div>
+    <div class="input-group mb-1">
+        <div class="input-group-prepend">
+          <span class="input-group-text" style="width: 90px;">Rating</span>
+        </div>
+        <input type="number" name="rating" class="form-control" placeholder="" />
+      </div> 
+      <div class="input-group mb-1">
+          <div class="input-group-prepend">
+            <span class="input-group-text" style="width: 90px;">Results</span>
+          </div>
+          <input type="number" name="size" class="form-control" placeholder="" />
+        </div>          
+    <input type="submit" value="Save" class="btn btn-outline-secondary" style="width: 90px;"/>
+  </form>
+
+  </br>
+  <!-- List view -->
+  <h3>Registered stores</h3>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead class="thead-light">       
+      </thead>
+      <tbody>
+        {% for el in store_list %}
+          <tr onclick="editStore(event, '{{ forloop.counter0 }}')">
+            <td style="width: 10px;">
+              <div class="btn-group">
+                <button type="button" onclick="showMenu(event, this);" class="btn btn-outline-dark btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">                   
+                  <b>{{ forloop.counter }}</b>
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="#" onclick="editStore(event, '{{ forloop.counter0 }}');">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-edit">
+                      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                    Edit
+                  </a>
+                  <a class="dropdown-item" href="#" onclick="deleteStore(event, '{{ forloop.counter0 }}');">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      <line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>
+                    </svg>
+                    Delete
+                  </a>
+                </div>
+              </div>              
+            </td>
+            <td style="width: 80px;">
+              <img src="{{ el.icon }}" width="80px" height="30px" alt="logo"/>
+            </td>
+            <td style="width: 160px;">
+              <div class="rating">
+                {% foreach 0 to el.rating %}
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="#FEB817" stroke="#FEB817" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star">
+                      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                {% endforeach %}
+                {% foreach el.rating to 5 %}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-star">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                  </svg>
+                {% endforeach %}
+              </div>
+            </td>
+            <td>{{ el.address }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</main> 
+{% endblock %}
+
+ <!-- scripts -->
+{% block scripts %}
+  <!-- base.js -->
+  {{ block.super }}
+ 
+  <script type="text/javascript">
+    // session 
+    const CSRF_TOKEN = '{{ csrf_token }}';
+
+    // render django variables
+    {% javascript error_list %}
+    {% javascript store_list %}
+
+    // show errors
+    if(error_list) {
+      showToast(error_list);
+    }
+
+    function editStore(event, index) {
+      // stop
+      event.stopPropagation();
+
+      let store = store_list[index];
+      let form = document.forms[1];
+      form['id'].value = store.id;
+      form['title'].value = store.title;
+      form['address'].value = store.address;
+      form['icon'].value = store.icon;
+      form['rating'].value = store.rating;
+      form['size'].value = store.size;
+    }
+
+    function deleteStore(event, index) {
+      // stop
+      event.stopPropagation();
+
+      let store = store_list[index];
+      showDialog("Confirm delete " + store.title, function() {
+        // delete form
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = "{% url 'web:delete' %}";
+        // id input
+        let input = document.createElement("input");
+        input.name = "id";
+        input.value = store.id;
+        form.appendChild(input);
+        // token input
+        input = document.createElement("input");
+        input.name = "csrfmiddlewaretoken";
+        input.value = CSRF_TOKEN;
+        form.appendChild(input);
+        // send
+        document.body.appendChild(form);
+        form.submit(); 
+      }, null);    
+    }
+
+    function showMenu(event, button) {
+      // stop
+      event.stopPropagation();
+
+      const group = button.parentElement;
+      const menu = group.querySelector(".dropdown-menu");
+      // toggle menu
+      if(menu.classList.contains("show")) {
+        menu.classList.remove("show");
+      } else {
+        menu.classList.add("show");
+      }
+      // hide menu after selection
+      menu.onclick = function() {
+        menu.classList.remove("show");
+        return false; // fallthrough
+      };
+    }
+
+  </script>
+{% endblock %}

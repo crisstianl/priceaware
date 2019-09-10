@@ -1,0 +1,90 @@
+<!-- container -->
+{% extends "base.html" %}
+
+<!-- custom tags -->
+{% load custom_tags %}
+
+<!-- replace the base.html block tags with content -->
+{% block content %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-4">
+  <!-- List view -->
+  <h3>Products in cart</h3>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead class="thead-light">       
+      </thead>
+      <tbody>
+        {% for el in item_list %}
+          <tr onclick="goto_store('{{ el.link }}');">
+            <td style="width: 10px;">
+              <b>{{ forloop.counter }}</b>
+              <a href="#" onclick="remove_item(event, '{{ el.id }}');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </a>
+            </td>
+            <td style="width: 80px;">
+              <img src="{{ el.store.icon }}" width="80px" height="30px" alt="logo"/>
+            </td>
+            <td>
+              {{ el.name }}
+            </td>
+            <td style="width: 100px;">
+              <b>{{ el.price }}</b>
+            </td>
+            <td>
+              <a href="{{ el.link }}" target="_blank">{{ el.link }}</a>
+            </td>            
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</main> 
+{% endblock %}
+
+ <!-- scripts -->
+{% block scripts %}
+  <!-- base.js -->
+  {{ block.super }}
+ 
+  <script type="text/javascript">
+    // session 
+    const CSRF_TOKEN = '{{ csrf_token }}';
+
+    // render django variables
+    {% javascript error_list %}
+
+    // show errors
+    if(error_list) {
+      showToast(error_list);
+    }
+
+    function remove_item(event, id) {
+      // stop
+      event.stopPropagation();
+
+      var xhttp = new XMLHttpRequest();
+      xhttp.timeout = 3000;
+      xhttp.onreadystatechange = function() {
+        if (4 == this.readyState) {
+          console.log("server remove_item() returned " + this.status + ": " + this.statusText);
+          if(300 > this.status) {
+            showToast("Product removed successfuly.");
+            window.location.reload();
+          } else {
+            showToast("Product remove failed with status " + this.statusText);
+          }
+        }
+      };
+      xhttp.open("POST", "{{ request.path }}", true);
+      xhttp.setRequestHeader("X-CSRFToken", CSRF_TOKEN);
+      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhttp.send("id=" + id);
+    }
+
+  </script>
+{% endblock %}

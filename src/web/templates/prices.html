@@ -1,0 +1,123 @@
+<!-- container -->
+{% extends "base.html" %}
+
+<!-- custom tags -->
+{% load custom_tags %}
+
+<!-- replace the base.html block tags with content -->
+{% block content %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-4">
+  <!-- Form fields -->
+  <h3>Search</h3>
+  <form method="GET" action="{{ request.path }}" onsubmit="showSpinner();"> <!-- make post to current url -->
+    <!-- CSRF token, otherwise will throw 403 forbidden -->
+    <!-- <input type="hidden" name="csrfmiddlewaretoken" value="ku9FEcdo..."> -->
+    {% csrf_token %} 
+    <div class="input-group mb-1">
+      <div class="input-group-prepend">
+        <input id="btn_submit" type="submit" value="Go" class="btn btn-outline-secondary" style="width: 90px;"/>
+      </div>
+      <input type="text" name="q" class="form-control" required="true" minlength="3" placeholder="" />
+    </div>
+  </form>
+  </br>
+
+  <!-- List view -->
+  <h3>Product results {{ item_list|length }}</h3>
+  <div class="table-responsive">
+    <table class="table table-hover">
+      <thead class="thead-light">       
+      </thead>
+      <tbody>
+        {% for el in item_list %}
+          <tr onclick="goto_store('{{ el.link }}');">
+            <td style="width: 10px;">
+              <b>{{ forloop.counter }}</b>
+              <a href="#" onclick="push_item(event, '{{ forloop.counter0 }}');">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="9" cy="21" r="1"></circle><circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </a>
+            </td>
+            <td style="width: 80px;">
+              <img src="{{ el.store.icon }}" width="80px" height="30px" alt="logo"/>
+            </td>
+            <td>
+              {{ el.name }}
+            </td>
+            <td style="width: 100px;">
+              <b>{{ el.price }}</b>
+            </td>
+            <td>
+              <a href="{{ el.link }}" target="_blank">{{ el.link }}</a>
+            </td>            
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</main> 
+{% endblock %}
+
+ <!-- scripts -->
+{% block scripts %}
+  <!-- base.js -->
+  {{ block.super }}
+ 
+  <script type="text/javascript">
+    // session 
+    const CSRF_TOKEN = '{{ csrf_token }}';
+
+    // render django variables
+    {% javascript error_list %}
+    {% javascript item_list %}
+
+    // show errors
+    if(error_list) {
+      showToast(error_list);
+    }
+
+    // override history action
+    window.on_history_selected = function(value) {
+      let form = document.forms[1];
+      form['q'].value = value;
+      form.submit();
+      showSpinner();
+    }
+
+    function goto_store(link) {
+      window.open(link, '_blank');
+    }
+
+    function push_item(event, index) {
+      // stop
+      event.stopPropagation();
+
+      // create formdata
+      const item = item_list[index];
+      const parameters = new Array();
+      for(let key in item ) {
+        parameters.push(encodeURIComponent(key) + '=' + encodeURIComponent(item[key]));
+      }
+      
+      var xhttp = new XMLHttpRequest();
+      xhttp.timeout = 3000;
+      xhttp.onreadystatechange = function() {
+        if (4 == this.readyState) {
+          console.log("server push_item() returned " + this.status + ": " + this.statusText);
+          if(300 > this.status) {
+            showToast("Product " + item.name + " saved successfuly.");
+          } else {
+            showToast("Product " + item.name + " failed with status " + this.statusText);
+          }
+        }
+      };
+      xhttp.open("POST", "{{ request.path }}", true);
+      xhttp.setRequestHeader("X-CSRFToken", CSRF_TOKEN);
+      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhttp.send(parameters.join('&'));
+    }
+
+  </script>
+{% endblock %}

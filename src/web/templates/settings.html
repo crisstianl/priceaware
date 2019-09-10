@@ -1,0 +1,46 @@
+<!-- container -->
+{% extends "base.html" %}
+
+<!-- replace the base.html block tags with content -->
+{% block content %}
+<main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4 mt-4">
+  <h3>Settings</h3>
+  <button type="button" class="btn btn-primary" onclick="do_action(event, 'del_cart')">Empty cart</button>
+  <button type="button" class="btn btn-warning" onclick="do_action(event, 'del_store')">Dismiss stores</button>
+  <button type="button" class="btn btn-danger" onclick="do_action(event, 'del_db')">Reset db</button>
+</main> 
+{% endblock %}
+
+ <!-- scripts -->
+{% block scripts %}
+  <!-- base.js -->
+  {{ block.super }}
+ 
+  <script type="text/javascript">
+    // session 
+    const CSRF_TOKEN = '{{ csrf_token }}';
+
+    function do_action(event, action) {
+      // stop
+      event.stopPropagation();
+      
+      var xhttp = new XMLHttpRequest();
+      xhttp.timeout = 3000;
+      xhttp.onreadystatechange = function() {
+        if (4 == this.readyState) {
+          console.log("server do_action() returned " + this.status + ": " + this.statusText);
+          if(300 > this.status) {
+            showToast("Operation completed successfuly.");
+          } else {
+            showToast("Operation failed with status " + this.statusText);
+          }
+        }
+      };
+      xhttp.open("POST", "{{ request.path }}", true);
+      xhttp.setRequestHeader("X-CSRFToken", CSRF_TOKEN);
+      xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+      xhttp.send("action=" + action);
+    }
+
+  </script>
+{% endblock %}

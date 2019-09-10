@@ -1,0 +1,88 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="en">
+<head>
+  <title>Base</title>
+  <meta name="description" content="web crawler">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1 shrink-to-fit=no">
+  <meta name="keywords" content="bot, brawler">
+  <meta name="domain" content="cristian.ro">
+  <meta name="author" content="cristian.ro">
+
+  <!-- styles -->
+  <link rel="stylesheet" href="/static/base.css">
+  <link rel="stylesheet" href="/static/bootstrap.min.css">
+</head>
+<body>
+
+  <!-- Header -->
+  {% include "header.html" %}  
+
+  <!-- Content body -->
+  <div class="container-fluid">
+    <div class="row">
+        {% include "navigation.html" %}  
+
+        {% block content %}
+        {% endblock %} 
+    </div>
+  </div>
+
+  <!-- spinner -->
+  <div id="spinner" class="loader">
+  </div>
+
+  <!-- toast notification -->
+  <div id="toast" class="toast shadow hide" role="alert" aria-live="assertive" aria-atomic="true" 
+    style="position: absolute; top: 80px; right: 20px; z-index: 9999; min-width: 300px;">
+    <div class="toast-header bg-light">
+      <svg xmlns="http://www.w3.org/2000/svg" class="rounded mr-2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon">
+        <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+        <line x1="12" y1="8" x2="12" y2="12"></line>
+        <line x1="12" y1="16" x2="12" y2="16"></line>
+      </svg>
+      <strong class="mr-auto">Attention</strong>
+      <small>just now</small>
+      <button type="button" class="close ml-2 mb-1" data-dismiss="toast" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="toast-body bg-white">
+      Hello, world!
+    </div>
+  </div>
+
+  <!-- modal dialog -->
+  <div id="modal" class="modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">
+              <svg xmlns="http://www.w3.org/2000/svg" class="rounded mr-2" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-alert-octagon">
+                <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12" y2="16"></line>
+              </svg>
+              Important
+            </h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Modal body text goes here.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Confirm</button>
+            <button type="button" class="btn btn-secondary">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  <!-- scripts -->
+  {% block scripts %}
+    <script type="text/javascript" src="/static/base.js"></script>
+  {% endblock %}
+</body>
+</html>
