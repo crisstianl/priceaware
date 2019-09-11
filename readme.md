@@ -19,11 +19,11 @@ Frameworks and libraries:
 - phantomJS
 
 Instalation:
-- create a virtual environment
-- pip install django 2.2
-- pip install bs4
-- pip install urllib
-- pip install selenium 3.1
+- create a virtual environment, virtualenv . -p python3
+- install django, pip install django=2.2.4
+- install beautifulsoup, pip install bs4
+- install url library, pip install urllib3==1.25
+- install seleniun framework, pip install selenium==3.11cd
 - copy the phantomJS executable into bin directory.
 - start your server.
 - go to http://server_ip/priceaware
