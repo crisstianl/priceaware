@@ -12,19 +12,6 @@
         </a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="{% url 'web:stores' %}">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list">
-            <line x1="8" y1="6" x2="21" y2="6"></line>
-            <line x1="8" y1="12" x2="21" y2="12"></line>
-            <line x1="8" y1="18" x2="21" y2="18"></line>
-            <line x1="3" y1="6" x2="3" y2="6"></line>
-            <line x1="3" y1="12" x2="3" y2="12"></line>
-            <line x1="3" y1="18" x2="3" y2="18"></line>
-          </svg>
-          Stores
-        </a>
-      </li>
-      <li class="nav-item">
         <a class="nav-link" href="{% url 'web:search' %}">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
             <circle cx="11" cy="11" r="8"></circle>
@@ -41,6 +28,19 @@
             <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
           </svg>
           Cart
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'web:stores' %}">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list">
+            <line x1="8" y1="6" x2="21" y2="6"></line>
+            <line x1="8" y1="12" x2="21" y2="12"></line>
+            <line x1="8" y1="18" x2="21" y2="18"></line>
+            <line x1="3" y1="6" x2="3" y2="6"></line>
+            <line x1="3" y1="12" x2="3" y2="12"></line>
+            <line x1="3" y1="18" x2="3" y2="18"></line>
+          </svg>
+          Stores
         </a>
       </li>
       <li class="nav-item">
@@ -63,7 +63,7 @@
       <span class="text-info">History</span>
     </h6>
     <ul class="nav flex-column mb-2">
-      {% for query in request.session.history %}
+      {% for query in request.session.search_history %}
         <li class="nav-item">
           <a class="nav-link" href="javascript:on_history_selected('{{ query }}');">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-file-text">

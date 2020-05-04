@@ -5,6 +5,7 @@ from sys import exc_info
 from selenium import webdriver
 from main.settings import WEB_DRIVER
 
+
 def factory(store, query):
     if 'altex' == store.title.lower():
         return AltexCrawler(store, query)
@@ -14,6 +15,8 @@ def factory(store, query):
         return EvomagCrawler(store, query)
     elif 'olx' == store.title.lower():
         return OlxCrawler(store, query)
+    elif 'cel' == store.title.lower():
+        return CelCrawler(store, query)
     else:
         return None
 
@@ -32,7 +35,8 @@ class AltexCrawler(object):
             soup = BeautifulSoup(driver.page_source, 'html.parser')           
             # print(soup.prettify())
 
-            for div in soup.find_all('li', {'class': 'Products-item'}, limit=self.store.size):
+            container_ul = soup.find('ul', {'class': 'Products'})
+            for div in container_ul.find_all('li', {'class': 'Products-item'}, limit=self.store.size):
                 # find product name
                 name_div = div.find('div', {'class': 'Product-list-center'})
                 name_href = name_div.find('a', {'class': 'Product-name'})
@@ -52,7 +56,7 @@ class AltexCrawler(object):
         except Exception as e:
             print("Scrapping error \"", exc_info()[0], "\" and message \"", e, "\"")
         finally:
-            print("Scrapping complete")
+            print("Scrapping altex completed")
             if driver: driver.quit()
 
         
@@ -65,13 +69,13 @@ class EmagCrawler(object):
     def run(self, callback):
         print("Scrapping emag:", self.url)
         httpPage = None
-        try:        
+        try:
             httpPage = request.urlopen(self.url, context=SSLContext())
             soup = BeautifulSoup(httpPage.read(), 'html.parser') 
-            #soup = BeautifulSoup(emg(), 'html.parser')           
             # print(soup.prettify())
 
-            for div in soup.find_all('div', {'class': 'card-item'}, limit=self.store.size):
+            container_div = soup.find('div', {'id': 'card_grid'})
+            for div in container_div.find_all('div', {'class': 'card-item'}, limit=self.store.size):
                 # find product name
                 name_div = div.find('div', {'class': 'card-section-mid'})
                 name_href = name_div.find('a', {'class': 'product-title'})
@@ -90,7 +94,7 @@ class EmagCrawler(object):
         except Exception as e:
             print("Scrapping error \"", exc_info()[0], "\" and message \"", e, "\"")
         finally:
-            print("Scrapping complete")
+            print("Scrapping emag completed")
             if httpPage: httpPage.close()
 
 
@@ -109,7 +113,8 @@ class EvomagCrawler(object):
             soup = BeautifulSoup(driver.page_source, 'html.parser')           
             # print(soup.prettify())
 
-            for div in soup.find_all('div', {'class': 'nice_product_container'}, limit=self.store.size):
+            container_div = soup.find('div', {'class': 'product_grid'})
+            for div in container_div.find_all('div', {'class': 'nice_product_container'}, limit=self.store.size):
                 # find product name
                 name_div = div.find('div', {'class': 'npi_name'})
                 name_href = name_div.findChild()
@@ -127,8 +132,9 @@ class EvomagCrawler(object):
         except Exception as e:
             print("Scrapping error \"", exc_info()[0], "\" and message \"", e, "\"")
         finally:
-            print("Scrapping complete")
+            print("Scrapping evomag completed")
             if driver: driver.quit()
+
 
 class OlxCrawler(object):
     def __init__(self, store, query):
@@ -142,12 +148,11 @@ class OlxCrawler(object):
         try:        
             driver = webdriver.PhantomJS(executable_path=WEB_DRIVER)
             driver.get(self.url)
-            soup = BeautifulSoup(driver.page_source, 'html.parser') 
-            #soup = BeautifulSoup(olx(), 'html.parser')           
+            soup = BeautifulSoup(driver.page_source, 'html.parser')           
             #print(soup.prettify())
 
-            table = soup.find('table', {'id': 'offers_table'})
-            for row in table.find_all('tr', {'class': 'wrap'}, limit=self.store.size):
+            container_table = soup.find('table', {'id': 'offers_table'})
+            for row in container_table.find_all('tr', {'class': 'wrap'}, limit=self.store.size):
                 inner_table = row.find('table')
                 first_row = inner_table.findChild().findChild()
                 cols = first_row.find_all('td')
@@ -164,5 +169,45 @@ class OlxCrawler(object):
         except Exception as e:
             print("Scrapping error \"", exc_info()[0], "\" and message \"", e, "\"")
         finally:
-            print("Scrapping complete")
+            print("Scrapping olx completed")
+            if driver: driver.quit()
+
+
+class CelCrawler(object):
+    def __init__(self, store, query):
+        super().__init__()
+        self.url = store.address + "cauta/" +  parse.quote(query)
+        self.store = store
+
+    def run(self, callback):
+        print("Scrapping cel:", self.url)
+        driver = None
+        try: 
+            driver = webdriver.PhantomJS(executable_path=WEB_DRIVER)
+            driver.get(self.url)
+            soup = BeautifulSoup(driver.page_source, 'html.parser')           
+            #print(soup.prettify())
+
+            container_div = soup.find('div', {'id': 'listProducts'})
+            for item_div in container_div.find_all('div', {'class': 'product_data'}, limit=self.store.size):
+                # find product name
+                info_div = item_div.find('div', {'class': 'productListing-nume'})
+                name_div = info_div.find('h2', {'class': 'productTitle'})
+                name_href = name_div.findChild()
+                name = name_href.findChild().text
+
+                # find product link
+                link = name_href.get('href')
+                
+                # find product price
+                price_div = info_div.find('div', {'class': 'pretWrapper'})
+                price_childs = price_div.findChild().findChildren()
+                price = price_childs[0].text + " " + price_childs[1].text
+                
+                # post result
+                callback(name, link, price, self.store)
+        except Exception as e:
+            print("Scrapping error \"", exc_info()[0], "\" and message \"", e, "\"")
+        finally:
+            print("Scrapping cel completed")
             if driver: driver.quit()

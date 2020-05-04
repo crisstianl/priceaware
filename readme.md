@@ -1,22 +1,26 @@
 ### Priceaware 
-is web application developed in Python and Django that facilitates users to search for a product in different online stores with one click and have quick access to prices, details, stores.
+Web application developed Django and Python that help users search for a product in different online stores with one click.       
+The application uses a windowless browser, called PhantomJS, to make GET requests on the web stores, but more importantly to execute the javascript code that renders Html elements.   
+Then using beautifulsoup library the application parses the Html page and extracts elements containing product data.   
+The above process is executed for every registered shop, but in a separate thread to flatten performance.  
 
 ### Usage:
-The user types the product name, code, model, manufacturer into the search form whichs posts a request to the backend.    
-The application uses a windowless browser, called PhantomJS, to make GET search requests on the web stores, but also to process dynamic javascript content.     
-After the page source was loaded by PhantomJS, the application passes the source html to the Beautifulsoup library
-and starts scrapping the divs, tables, hrefs for prices, names, links of the product. 
-The above process repeats for every registered store, after which the results are rendered nicely to the end user.
+Type a product name, code, model, manufacturer into the search form and press enter.        
+The application returns the full name and description of the product, the price, and a link to the product.  
+The results are ordered by the rating of each store.  
+If you find a result that interests you, then you can save it in the cart and review it later.  
+If you fancy a certain store, then you can tweak the algorithm to prioritise the search and return results from this store firstly or return more products.
 
 ### Instalation:
-- create a virtual environment, virtualenv . -p python3
-- install django, pip install django=2.2.4
-- install beautifulsoup, pip install bs4
-- install url library, pip install urllib3==1.25
-- install seleniun framework, pip install selenium==3.11cd
-- copy the phantomJS executable into bin directory.
-- start your server.
-- go to http://localhost:8000/priceaware
+- create virtual environment, "virtualenv . -p python3"
+- install django, "pip install django=2.2.4"
+- install beautifulsoup, "pip install bs4"
+- install url library, "pip install urllib3==1.25"
+- install seleniun framework, "pip install selenium==3.11cd"
+- copy the phantomJS executable into bin directory
+- active virtual environment, "source bin/activate"
+- start local server, "python src/manage.py runserver 8080"
+- go to http://localhost:8080/priceaware
 
 ### Frameworks and libraries:
 - python 3.7

@@ -4,9 +4,14 @@ from .forms import StoreForm, SearchForm, ItemForm
 from persistence.daos import StoreDAO, ItemDAO, drop_db
 from persistence.models import Store, Item
 from api.crawlers import factory 
+from concurrent.futures import ThreadPoolExecutor
 
 def index(request, *args, **kwargs):
-    print("REQUEST/index:", request)
+    print("REQUEST/index")
+    return search(request, args, kwargs)
+
+def stores(request, *args, **kwargs):
+    print("REQUEST/stores:", request)
     print("ARGS:", args)
     print("KWARGS:", kwargs)
 
@@ -56,14 +61,25 @@ def search(request, *args, **kwargs):
         if "q" in request.GET: 
             q_results = list()
             q_str = request.GET.get('q')
+          
+            # create crawlers
+            crawlers = list()
+            for store in storeDAO.query_all(0, 100):            
+                crawler = factory(store, q_str)
+                if crawler: crawlers.append(crawler) 
+
+            # push result in context list
             def callback(name, link, price, store):
                 q_item = Item(name=name, link=link, price=price, store=store)
                 q_results.append(q_item)
 
-            for store in storeDAO.query_all(0, 100):            
-                crawler = factory(store, q_str)
-                if crawler: 
-                    crawler.run(callback)
+            # execute each scrape in a separate thread
+            with ThreadPoolExecutor(max_workers = len(crawlers)) as exec:
+                for crawler in crawlers:
+                    exec.submit(crawler.run, callback)
+
+            # scrapping completed, sort results
+            q_results.sort(reverse=True, key = lambda e : e.store.rating)
 
             my_context["item_list"] = q_results
             add_search_history(request, q_str) 
@@ -159,8 +175,8 @@ def as_str(formErrors):
     return str
 
 def add_search_history(request, value):
-    if "history" in request.session:
-        request.session['history'].append(value)
+    if "search_history" in request.session:
+        request.session['search_history'].append(value)
     else:
-        request.session['history'] = [value, ]
+        request.session['search_history'] = [value, ]
     

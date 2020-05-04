@@ -7,7 +7,7 @@ app_name = "web"
 # define component url-patterns
 urlpatterns = [
     path('', views.index, name='index'),
-    path('stores', views.index, name='stores'),
+    path('stores', views.stores, name='stores'),
     path('search', views.search, name='search'),
     path('stores/delete', views.delete, name='delete'),
     path('cart', views.cart, name='cart'),
